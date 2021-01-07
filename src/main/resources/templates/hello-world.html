@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!-- <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"> -->
+
+<!-- <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"> -->
+  
+  <html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  
+   <!-- Bootstrap CSS -->
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  
+			
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+  
+  	    <script type = "text/javascript">
+  	    
+		  	  var list = [
+		  			"img/background1.jpg",	//dodati zarez i jos slika ispod ako je potrebno					
+				    "img/background2.jpg",	//ako se doda jos slika, promeniti uslov if-a... krug<3 ili
+				    "img/background.jpg"
+		  	  ];
+		
+		  	   var index = 0;
+		
+		  	function changeLights() {
+		  	    //if (index == list.length) index = 0;
+		  	    if(index == list.length){
+		  	    	index = 0;
+		  	    }
+		  	    document.body.style.backgroundImage = "url('" + list[index] + "')";
+		  	    index++;
+		  	}
+		  	setInterval(function(){changeLights()}, 5000);
+        </script>
+
+<style>
+	body{background:url(img/background.jpg) no-repeat center center fixed; transition: background 2s ease; transition-delay: 2s;}
+	*{color:white;}
+</style>
+
+</head>
+<body style="background: url('/img/background.jpg') no-repeat center center fixed">
+
+		<h2>HELLO WORLD</h2>
+
+		<!-- LOGOUT -->
+			<!-- Add a logout button MORA BITI U OBLIKU form:form JER TAKO MORA DA BIH SUBMITOVAO I DA BI ME POSLAO NA NPR LOGIN STRANICU -->
+		<!-- <a href="#" th:href="@{/logout}">Log Out</a> -->
+		<form th:action="@{/logout}" method="post">
+		    <input type="submit" value="LOGOUT" class="btn btn-info"></input>
+		</form>
+        		
+</body>
+</html>

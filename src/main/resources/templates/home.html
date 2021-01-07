@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<!-- <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"> -->
+
+<!-- <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"> -->
+  
+  <html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  
+   <!-- Bootstrap CSS -->
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  
+			
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+  
+  	    <script type = "text/javascript">
+  	    
+		  	  var list = [
+		  			"img/background1.jpg",	//dodati zarez i jos slika ispod ako je potrebno					
+				    "img/background2.jpg",	//ako se doda jos slika, promeniti uslov if-a... krug<3 ili
+				    "img/background.jpg"
+		  	  ];
+		
+		  	   var index = 0;
+		
+		  	function changeLights() {
+		  	    //if (index == list.length) index = 0;
+		  	    if(index == list.length){
+		  	    	index = 0;
+		  	    }
+		  	    document.body.style.backgroundImage = "url('" + list[index] + "')";
+		  	    index++;
+		  	}
+		  	setInterval(function(){changeLights()}, 5000);
+        </script>
+
+<style>
+	body{background:url(img/background.jpg) no-repeat center center fixed; transition: background 2s ease; transition-delay: 2s;}
+	*{color:white;}
+</style>
+
+</head>
+<body style="background: url('/img/background.jpg') no-repeat center center fixed">
+
+		<h2>SPRING SECURITY OMOGUCAVA AUTORIZACIJU KORISNIKA PO ROLAMA - KOME CE STA BITI PRIKAZANO</h2>
+        
+        <div sec:authorize="hasRole('EMPLOYEE')">
+        	<p>Text visible to EMPLOYEE EVERYONE??.</p>
+        </div>
+        
+        <div sec:authorize="hasRole('ADMIN')">
+        	<p>Text visible to admin.</p>	<br>
+        	<a th:href="@{/systems}" class="btn btn-primary">ADMIN ONLY</a>        <br><br>
+        	<a th:href="@{customers/employeeAdminListCustomers}" class="btn btn-primary">LOOK AT LIST OF Customers</a>
+        	<br><br>
+        	<a th:href="@{users/employeeAdminListUsers}" class="btn btn-primary">LOOK AT LIST OF Users</a>
+        	<br><br>
+        	<a th:href="@{mojMailKontroler/goToFormForMail}" class="btn btn-primary">SEND MAIL WITHOUT ATTACHMENTS</a>
+        	<br><br>
+        	<a th:href="@{mojMailKontroler/goToFormForMailWithAttachment}" class="btn btn-primary">SEND MAIL WITH ATTACHMENTS</a>
+        </div>
+        
+        <br><br>
+        
+        <div sec:authorize="hasRole('MANAGER')">
+        	<p>Text visible to MANAGER.	<br></p>
+        	<a th:href="@{/employee}" class="btn btn-primary">MANAGER ONLY</a>        <br><br>
+        	<a th:href="@{customers/employeeManagerListCustomers}" class="btn btn-primary">LOOK AT LIST OF Customers</a>
+        </div>
+        
+        <br><br>        
+        
+        <div sec:authorize="isAuthenticated()">
+            <p>Text visible only to authenticated users.</p>
+        </div>
+        
+        <br>
+        
+        <div><h3>Authenticated username:</h3>
+        	<h2 sec:authentication="name"></h2>
+        </div>
+        
+        <div><h3>Authenticated user roles:</h3>
+        	<!-- <h2 sec:authentication="principal.authorities"></h2> -->	<!-- OVAKO CE ISPISATI [ROLE_ADMIN] [ROLE_EMPLOYEE] [ROLE_ADMIN] -->
+        	
+        	<!--THYMELEAF OBEZBEDJUJE PRISTUP #authentication OBJEKTU GDE VRACAMO LISTU AUTHORITIES-A, PA MOZEMO RECI DA UKLONI "ROLE_" PRI ISPISU  
+        		OVAKO CE ISPISATI BEZ ROLE_ (ADMIN ILI MANAGER ILI EMPLOYEE) -->
+        	<p th:each="authority : ${#authentication.getAuthorities()}"		
+		       th:if="${authority.getAuthority().startsWith('ROLE_')}"
+		       th:text="${authority.getAuthority().replaceFirst('ROLE_', '')}">
+		    </p>
+        </div>
+        
+        
+        <br><br>
+		<a th:href="@{/helloWorld}" class="btn btn-primary">Hello World</a>
+		<br><br>
+
+		<!-- LOGOUT -->
+			<!-- Add a logout button MORA BITI U OBLIKU form:form JER TAKO MORA DA BIH SUBMITOVAO I DA BI ME POSLAO NA NPR LOGIN STRANICU -->
+		<!-- <a href="#" th:href="@{/logout}">Log Out</a> -->
+		<form th:action="@{/logout}" method="post">
+		    <input type="submit" value="LOGOUT" class="btn btn-info"></input>
+		</form>   
+
+
+
+		<br><br>
+		
+
+
+
+
+     		
+
+		<!-- MOZE I OVAKO, JEDINA RAZLIKA JE hasRole('ROLE_ADMIN')
+		 <div sec:authorize="isAuthenticated()">
+		  This content is only shown to authenticated users.
+		</div>
+		<div sec:authorize="hasRole('ROLE_ADMIN')">
+		  This content is only shown to administrators.
+		</div>
+		<div sec:authorize="hasRole('ROLE_MANAGER')">
+		  This content is only shown to MANAGER.
+		</div> -->
+		
+		<!-- ovo bi samo video admin 
+		<a th:href="@{/systems}">ADMIN</a>
+			ovo bi samo video manager
+        <a th:href="@{/employee}">MANAGER</a>
+		 -->
+
+        		<!-- <a href="@{/authenticateTheUser}/systems">ADMIN</a>
+        		@{/employees/showFormForAdd} -->
+        		
+</body>
+</html>
