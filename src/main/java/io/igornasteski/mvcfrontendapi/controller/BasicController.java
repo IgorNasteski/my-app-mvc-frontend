@@ -17,10 +17,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -44,7 +46,7 @@ public class BasicController {
     }
 
     @PostMapping("/processNewSignUpUser")
-    public String processNewSignUpUser(@Valid @ModelAttribute("user")UserSignUpRequest userSignUpRequest, BindingResult bindingResult){
+    public String processNewSignUpUser(@Valid @ModelAttribute("user")UserSignUpRequest userSignUpRequest, BindingResult bindingResult, RedirectAttributes ra){
 
         if(bindingResult.hasErrors()) {
             return "signUpForma";
@@ -58,10 +60,26 @@ public class BasicController {
         //Ocekujem AuthenticationResponse(String jwt) a saljem AuthenticationRequest(String username, String password)
         String response = restTemplate.postForObject(url, userSignUpRequest, String.class);
 
+        if(response.equalsIgnoreCase("username-already-taken")){
+            bindingResult.addError(new FieldError("user", "username", "Username is already in use."));
+            ra.addFlashAttribute("message2", "Username is already taken!");
+            return "redirect:/signUp";
+        }
+        if(response.equalsIgnoreCase("email-already-taken")){
+            ra.addFlashAttribute("message3", "Email is already taken!");
+            return "redirect:/signUp";
+        }
+
+        ra.addFlashAttribute("message", "Success! Your registration is now complete.");
+
         System.out.println("SIGN UP RESPONSE STRING " + response);
 
         //success-registration(link to login) or error-registration(link to login)
-        return response;
+        if(response.equalsIgnoreCase("success-registration")){
+            return "redirect:/showMyLoginPage";
+        }
+        else return response;
+        //return response;
     }
 
     //SPRING SECURITY NAS PRVO SALJE NA OVU PUTANJU /showMyLoginPage A TO SMO DEFINISALI U config klasi SecurityConfiguration.java, DA NAS PRVO SALJE TAMO PRI LOGIN-U
@@ -85,7 +103,7 @@ public class BasicController {
     }*/
 
     @PostMapping("/checkUserAuthenticationInRestApi")
-    public String checkUserWithRest(@ModelAttribute("authRequest")AuthenticationRequest authenticationRequest){
+    public String checkUserWithRest(@ModelAttribute("authRequest")AuthenticationRequest authenticationRequest, BindingResult bindingResult){
         System.out.println("USAO U /checkUserAuthenticationInRestApi");
         System.out.println("USERNAME " + authenticationRequest.getUsername() + " PASSWORD " + authenticationRequest.getPassword());
 

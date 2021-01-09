@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank;
 public class UserSignUpRequest {
 
     @JsonProperty
-    @Length(min = 5, message = "Username must contains at least 4 characters")
+    @Length(min = 5, message = "Username must contains at least 5 characters")
     @NotBlank(message = "Enter your username")
     private String username;
 
