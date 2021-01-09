@@ -17,6 +17,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
 
 import javax.sql.DataSource;
 
@@ -25,24 +28,28 @@ import javax.sql.DataSource;
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
     private String[] PUBLIC_MATCHERS = {
-            "/authenticate",
+            "/authenticateLogin",
             "/webjars/**",	//OVE FOLDERE(webjars,css,js) ZA SAD NEMAM U resources/static/ ALI NIJE PROBLEM, BITAN MI JE SAMO
             "/css/**",		//BIO FOLDER img DA BIH DOZVOLIO SLIKAMA DA SE PRIKAZUJU NA LOGIN STRANICI fancy-login
             "/js/**",
             "/img/**",
             "/signUp/**",
-            "/processNewSignUpUser/**"
+            "/processNewSignUpUser/**",
+            "showMyLoginPage/**",
+            "/checkUserAuthenticationInRestApi/**",
+            "/helloWorld/**",
+            "/probaZaSlanjeRequestObjektaIHedera/**"
     };
 
     //enable connection with mysql db
-    /*@Autowired
+    @Autowired
     DataSource dataSource;
 
     //Enable jdbc authentication
     @Autowired
     public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication().dataSource(dataSource);
-    }*/
+    }
 
 
 
@@ -90,17 +97,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                     .authorizeRequests().antMatchers(PUBLIC_MATCHERS).permitAll()   //pusti sve usere da budu autentikovani za ovaj endpoint
                     .anyRequest().authenticated()
                 .and()//za sve druge endpointe trazi autentikaciju
-                    .formLogin()
+                    .formLogin().permitAll()
                         .loginPage("/showMyLoginPage") //KAZEMO DA UMESTO DA KORISTI DEFAULTNU-NE STILIZOVANU VERZIJU LOGINA KOJI
                         //NAM SPRING PO DEFAULTU OMOGUCAVA, MI KAZEMO IDI NA OVU PUTANJU
                         //SERVLETA(LoginController) PA U NJOJ NA JSP STRANICU KOJU VRACAMO(NASA STILIZOVANA FORMA ZA LOGIN)
-                        .loginProcessingUrl("/authenticateTheUser")	//OVDE NAS FORMA DALJE SALJE KADA NAKON UNOSA USERNAMEA, AUTOMATSKI U POZADINI ODRADJUJE PROVERU
+        //                .loginProcessingUrl("/authenticateTheUser")	//OVDE NAS FORMA DALJE SALJE KADA NAKON UNOSA USERNAMEA, AUTOMATSKI U POZADINI ODRADJUJE PROVERU
                         //NE MORAM NISTA DA ODRADIM, SAM CE MI SPRING BOOT SECURITY ODRADITI AUTENTIKACIJU(DA LI JE USERNAME I PASSWORD OK)
-                        .permitAll()
+        //                .permitAll()
                         //.defaultSuccessUrl("/")
-                        //.usernameParameter("username").passwordParameter("password")
                 .and()
-                    .logout().permitAll()	//DODAJEM MOGUCNOST/OPCIJU ZA LOGOUT !!!!!
+                    .logout()
+                    .logoutUrl("/logout")
+                    .permitAll()	//DODAJEM MOGUCNOST/OPCIJU ZA LOGOUT !!!!!
+                                .clearAuthentication(true)      //nisam siguran koliko je ovo bitno
+                                .invalidateHttpSession(true)    //"onesposobi trenutnu sesiju" - nisam siguran koliko je ovo bitno
+                                .deleteCookies("JSESSIONID")
                 .and()
                     .exceptionHandling().accessDeniedPage("/access-denied");
 
